@@ -70,7 +70,8 @@
       <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
       <span class="meter-label">${meterLabel}</span>
     </div>`;
-  // The framing hint and privacy note sit behind a "?" button that appears with the photo.
+  // The framing hint and privacy note sit behind a "?" button that appears with the photo;
+  // before then, a short privacy line sits under the empty mirror.
   // data-photo-help="inline" shows them as plain text instead.
   const helpTip = stage.dataset.photoHelp !== 'inline';
   const PRIVACY_TEXT = 'Your photo never leaves this device. It is kept only while this browser tab is open, ' +
@@ -78,6 +79,7 @@
   const FRAMING_TEXT = 'Drag to position · pinch or scroll to zoom';
   stage.insertAdjacentHTML('afterend', helpTip ? `
     <div class="photo-tools with-help" id="photoTools">
+      <span class="no-photo">Your photo never leaves this device and is cleared when you close this tab.</span>
       <button class="link photo-only" type="button" id="changePhoto">Change photo</button>
       <span class="help photo-only">
         <button class="help-btn" type="button" aria-label="Photo tips and privacy" aria-expanded="false" aria-describedby="photoHelp">?</button>

@@ -344,7 +344,9 @@ input[type=range]::-moz-range-thumb {
 }
 
 /* ---------- Photo help tooltip ---------- */
-.photo-tools.with-help:not(.has-photo) .photo-only { display: none; }
+.photo-tools.with-help:not(.has-photo) .photo-only,
+.photo-tools.with-help.has-photo .no-photo { display: none; }
+.photo-tools .no-photo { text-align: center; }
 .help { position: relative; display: inline-flex; }
 .help-btn {
   width: 24px;
