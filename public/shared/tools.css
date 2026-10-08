@@ -134,6 +134,62 @@
 }
 .tool-nav-scrim[hidden] { display: none; }
 
+/* ---------- QR code ---------- */
+.tool-nav-qr {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 16px 18px;
+  border-top: 1px solid var(--line);
+}
+.qr-thumb {
+  width: 104px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  cursor: zoom-in;
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+.qr-thumb:hover { box-shadow: 0 4px 14px rgba(0,0,0,.12); transform: scale(1.03); }
+.qr-thumb:focus-visible { outline: 3px solid #2f6fdf; outline-offset: 2px; }
+.qr-thumb svg, .qr-big svg { display: block; width: 100%; height: auto; }
+.qr-caption { font-size: 12px; color: #6b7280; }
+
+/* Large QR: 80% of the screen's narrowest side */
+.qr-dialog {
+  width: min(80vmin, 100dvh - 96px);   /* leave room for the caption on short landscape screens */
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+.qr-dialog[open] { animation: qr-expand .22s ease-out; }
+.qr-dialog::backdrop { background: rgba(17,24,39,.6); }
+.qr-big { display: block; width: 100%; padding: 0; border: 0; background: #fff; cursor: zoom-out; }
+.qr-dialog-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0 16px 16px;
+  font-size: clamp(14px, 2.4vmin, 20px);
+  text-align: center;
+}
+.qr-dialog-caption span { font-size: .75em; color: #6b7280; }
+@keyframes qr-expand {
+  from { transform: scale(.25); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
 body.has-tool-nav { padding-left: var(--nav-width); }
 
 /* Narrow screens: the column becomes a slide-out panel */
@@ -157,4 +213,5 @@ body.has-tool-nav { padding-left: var(--nav-width); }
 }
 @media (prefers-reduced-motion: reduce) {
   .tool-nav, .tool-nav.open { transition: none; }
+  .qr-dialog[open] { animation: none; }
 }
