@@ -270,6 +270,77 @@ input[type=range]::-moz-range-thumb {
 }
 .pole.mid svg { width: 44px; height: 10px; }
 
+/* ---------- Balance mode: the mirror rides a beam between Tell and Ask ---------- */
+.stage.balance-mode {
+  --lean: 0;            /* -1 all Tell … +1 all Ask, set by mirror.js */
+  --travel: 120px;      /* how far the mirror can slide, set by mirror.js */
+  --tilt: 9deg;         /* beam angle at full lean */
+  display: flex;
+  justify-content: center;
+}
+.beam-rig {
+  position: relative;
+  width: min(100%, 600px);
+  padding-bottom: 62px;
+}
+.beam-tilt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotate(calc(var(--lean) * var(--tilt)));
+  transform-origin: 50% calc(100% - 4px);              /* pivot on the beam's center */
+  transition: transform .45s cubic-bezier(.3, 1.35, .5, 1);   /* settles with a little sway */
+}
+.beam-slide {
+  transform: translateX(calc(var(--lean) * var(--travel)));
+  transition: transform .45s cubic-bezier(.3, 1.35, .5, 1);
+}
+.beam {
+  width: 100%;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #a2373a, #7d4fb0 50%, #5b6ee8);
+}
+.fulcrum {
+  width: 0;
+  height: 0;
+  margin: 0 auto;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 22px solid #374151;
+}
+.beam-end {
+  position: absolute;
+  bottom: 18px;
+  font-size: 26px;
+  font-weight: 800;
+}
+.beam-end.tell { left: 0; color: #a2373a; }
+.beam-end.ask { right: 0; color: #5b6ee8; }
+.beam-goal {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .beam-tilt, .beam-slide { transition: none; }
+}
+
 /* Center word under each slider's midpoint */
 .track { position: relative; width: 100%; }
 .mid-word {
@@ -324,4 +395,5 @@ input[type=range]::-moz-range-thumb {
   .pole.hi { justify-content: flex-end; }
   .pole.mid { font-size: 11px; }
   .pole.mid svg { display: none; }
+  .beam-end { font-size: 19px; bottom: 20px; }
 }

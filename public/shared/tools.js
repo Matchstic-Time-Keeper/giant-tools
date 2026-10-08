@@ -17,9 +17,16 @@
       description: 'How responsive am I? Assess how secure, confident and humble you are.',
       letter: 'R',
     },
+    {
+      slug: 'push-pull',
+      name: 'Push or Pull',
+      question: 'How do I influence others?',
+      description: 'How do I influence others? See whether you lean toward telling or asking.',
+      glow: 'balance',
+    },
   ];
 
-  const icon = t => `<span class="tool-icon" aria-hidden="true">${t.letter ? `<span class="tool-letter">${t.letter}</span>` : ''}</span>`;
+  const icon = t => `<span class="tool-icon${t.glow ? ` glow-${t.glow}` : ''}" aria-hidden="true">${t.letter ? `<span class="tool-letter">${t.letter}</span>` : ''}</span>`;
 
   const card = (t, { compact = false, current = false } = {}) => `
     <li>

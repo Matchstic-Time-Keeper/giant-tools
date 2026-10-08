@@ -13,6 +13,7 @@ public/
                            tools.css + tools.js: the tool list, landing cards and left Tools navigation
   leadership-mirror/       one folder per tool, served at /<folder>/
   resistant-responsive/
+  push-pull/               balance mode: the mirror rides a Tell ↔ Ask beam
   serve.json               static server config (clean URLs, no-index headers)
   robots.txt               keeps search engines out
 drafts/                    local experiments, not committed or deployed
@@ -30,6 +31,7 @@ Then open http://localhost:3000.
 ## Add a new tool
 
 1. Copy an existing tool's `index.html` into `public/<tool-name>/` and change the question and sliders. The page only holds its own content; `/shared/mirror.js` builds the mirror. Keep `<meta name="robots" content="noindex, nofollow">` in the head.
+   - Balance tools: `data-mode="balance"` on the stage and `data-side="push"|"pull"` on sliders (see `push-pull`).
    - Optional: `data-mid` on a slider shows a center word under its midpoint; a `.poles` header adds overall pole labels (see `resistant-responsive`).
 2. Add the tool to the `TOOLS` list in `public/shared/tools.js`. The landing page and the left navigation both build from it (`letter` puts a letter in its mirror thumbnail).
 3. Commit and push to `main`. Railway deploys automatically.

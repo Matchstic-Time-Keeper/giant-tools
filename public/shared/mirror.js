@@ -6,6 +6,10 @@
 //   <button id="reset">, <p class="privacy">
 // and this script builds the mirror + meter, wires the sliders, and handles the photo.
 //
+// Balance mode (data-mode="balance", e.g. Push / Pull): sliders sit in [data-scales] and
+// carry data-side="push" | "pull". The mirror rides a beam with Tell and Ask at its ends
+// instead of the meter.
+//
 // The photo is kept in sessionStorage so it follows the person between tools in the
 // same tab, and is cleared by the browser when that tab or window closes.
 (() => {
@@ -19,11 +23,14 @@
   const FOG_CURVE = 1;      // >1 clears quickly at first, then tapers toward mid-green
   const PHOTO_KEY = 'giantTools.photo';
   const PHOTO_MAX_EDGE = 1600;  // downscale before keeping, so it fits in session storage
+  const BALANCE_STOPS = [[0, '#a2373a'], [0.5, '#7d4fb0'], [1, '#5b6ee8']];   // Tell → balanced → Ask
 
   // ---------- Markup ----------
   const stage = document.querySelector('[data-mirror]');
   const meterLabel = stage.dataset.meterLabel || 'Influence';
-  stage.innerHTML = `
+  const balanceMode = stage.dataset.mode === 'balance';
+  stage.classList.toggle('balance-mode', balanceMode);
+  const MIRROR_HTML = `
     <div class="mirror" id="mirror" role="button" tabindex="0" aria-label="Add your photo">
       <img class="photo" id="photo" alt="Your portrait">
       <div class="shine" id="shine"></div>
@@ -42,7 +49,20 @@
         </svg>
         <span>Tap to add<br>your photo</span>
       </div>
-    </div>
+    </div>`;
+  stage.innerHTML = balanceMode ? `
+    <div class="beam-rig">
+      <div class="beam-tilt">
+        <div class="beam-slide">${MIRROR_HTML}</div>
+        <div class="beam" aria-hidden="true"></div>
+      </div>
+      <div class="fulcrum" aria-hidden="true"></div>
+      <span class="beam-end tell" aria-hidden="true">Tell</span>
+      <span class="beam-end ask" aria-hidden="true">Ask</span>
+      <span class="beam-goal" aria-hidden="true">Balanced</span>
+      <div class="sr-only" id="beam" role="meter" aria-label="Balance between Tell and Ask"
+        aria-valuemin="-100" aria-valuemax="100" aria-valuenow="0"></div>
+    </div>` : `${MIRROR_HTML}
     <div class="meter" id="meter" role="meter" aria-label="${meterLabel}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
       <svg class="meter-arrow" viewBox="0 0 12 8" aria-hidden="true"><path d="M6 0 12 8H0z"/></svg>
       <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
@@ -91,16 +111,18 @@
 
   const LAB_STOPS = STOPS.map(([t, hex]) => [t, rgbToOklab(hexToRgb(hex))]);
 
-  function colorAt(t) {
-    for (let i = 1; i < LAB_STOPS.length; i++) {
-      const [t1, c1] = LAB_STOPS[i];
+  const LAB_BALANCE = BALANCE_STOPS.map(([t, hex]) => [t, rgbToOklab(hexToRgb(hex))]);
+
+  function colorAt(t, stops = LAB_STOPS) {
+    for (let i = 1; i < stops.length; i++) {
+      const [t1, c1] = stops[i];
       if (t <= t1) {
-        const [t0, c0] = LAB_STOPS[i - 1];
+        const [t0, c0] = stops[i - 1];
         const k = (t - t0) / (t1 - t0);
         return c0.map((v, j) => v + (c1[j] - v) * k);
       }
     }
-    return LAB_STOPS[LAB_STOPS.length - 1][1];
+    return stops[stops.length - 1][1];
   }
 
   // Each slider contributes its bar color, weighted by distance from center.
@@ -127,7 +149,7 @@
   }
 
   // ---------- Sliders ----------
-  const sliders = [...document.querySelectorAll('.scales input[type=range]')];
+  const sliders = [...document.querySelectorAll('.scales input[type=range], [data-scales] input[type=range]')];
 
   // A slider with data-mid gets its center word shown under the midpoint
   sliders.filter(s => s.dataset.mid).forEach(s => {
@@ -142,7 +164,9 @@
   const shine = document.getElementById('shine');
   const meter = document.getElementById('meter');
   const meterFill = document.getElementById('meterFill');
+  const beam = document.getElementById('beam');
   let fog = 0, blur = 0;
+  const mean = xs => xs.reduce((a, b) => a + b, 0) / (xs.length || 1);
 
   function describe(el) {
     const v = +el.value;
@@ -150,34 +174,66 @@
     return `${v}, leaning ${v < 50 ? el.dataset.lo : el.dataset.hi}`;
   }
 
-  // Aura: the blended color glows around the mirror; the photo itself stays untouched.
-  // Fog follows the average score: heavy at the red end, light at neutral, gone
-  // from mid-green up. A slight blur lingers past that, tied to the lowest slider,
-  // so the mirror is only perfectly sharp once every slider is all the way right.
-  function update() {
-    const values = sliders.map(s => s.value / 100);
-    const { rgb, strength } = blend(values);
-    const k = strength ** 0.6;
-    mirror.style.boxShadow = rgb
+  // Aura: the glow color carries the score; the photo itself stays untouched.
+  function setGlow(rgb, k) {
+    mirror.style.boxShadow = rgb && k
       ? `0 0 ${18 + 30 * k}px ${3 + 10 * k}px rgba(${rgb},${(.8 * k).toFixed(3)}),` +
         `0 0 ${80 + 90 * k}px ${20 + 50 * k}px rgba(${rgb},${(.3 * k).toFixed(3)})`
       : '';
+  }
 
-    const avg = values.reduce((a, b) => a + b, 0) / values.length;
-    fog = Math.max(0, (CLEAR_AT - avg) / CLEAR_AT) ** FOG_CURVE;
-    const lowest = Math.min(...values);
+  // Fog is heavy at a low score, light at neutral, and gone from CLEAR_AT up. A slight
+  // blur lingers past that, tied to the lowest slider, so the mirror is only perfectly
+  // sharp once every slider is all the way right.
+  function setClarity(score, lowest) {
+    fog = Math.max(0, (CLEAR_AT - score) / CLEAR_AT) ** FOG_CURVE;
     const linger = LINGER_BLUR * Math.min(1, (1 - lowest) / 0.1) ** 0.5;   // fades over the last 10%
     blur = Math.max(fog * MAX_BLUR, linger);
     fogLayer.style.opacity = (fog * MAX_FOG).toFixed(3);
-    shine.style.opacity = (Math.max(0, (avg - CLEAR_AT) / (1 - CLEAR_AT)) * .8).toFixed(3);
+    shine.style.opacity = (Math.max(0, (score - CLEAR_AT) / (1 - CLEAR_AT)) * .8).toFixed(3);
     applyPhotoFilter();
+  }
 
-    // The meter rises with the average score
+  // Standard tools: glow blends the three slider colors, clarity and the meter follow the average.
+  function updateScore(values) {
+    const { rgb, strength } = blend(values);
+    setGlow(rgb, strength ** 0.6);
+    const avg = mean(values);
+    setClarity(avg, Math.min(...values));
+
     const pct = Math.round(avg * 100);
     meterFill.style.setProperty('--level', avg.toFixed(3));
     meter.setAttribute('aria-valuenow', pct);
     meter.setAttribute('aria-valuetext', `${meterLabel} ${pct} percent`);
+  }
 
+  // Balance tools: the beam tips toward the stronger side and the mirror slides with it.
+  // Glow runs red (Tell) → purple (balanced) → blue (Ask) and grows with overall use;
+  // the fog clears as the weaker side grows, so the clearest mirror means strong use of both.
+  function updateBalance(values) {
+    const side = name => mean(values.filter((_, i) => sliders[i].dataset.side === name));
+    const push = side('push'), pull = side('pull');
+    const lean = pull - push;                       // -1 all Tell … +1 all Ask
+    setGlow(oklabToRgb(colorAt((lean + 1) / 2, LAB_BALANCE)).join(','), ((push + pull) / 2) ** 0.6);
+    setClarity(Math.min(push, pull), Math.min(...values));
+
+    stage.style.setProperty('--lean', lean.toFixed(3));
+    const pct = Math.round(lean * 100);
+    beam.setAttribute('aria-valuenow', pct);
+    beam.setAttribute('aria-valuetext', Math.abs(pct) < 5 ? 'Balanced'
+      : `Leaning ${pct < 0 ? 'Tell' : 'Ask'}, ${Math.abs(pct)} percent`);
+  }
+
+  // How far the mirror can slide before reaching the end of the beam
+  function layoutBeam() {
+    if (!balanceMode) return;
+    const rig = stage.querySelector('.beam-rig');
+    stage.style.setProperty('--travel', `${Math.max(0, (rig.clientWidth - mirror.offsetWidth) / 2 - 6)}px`);
+  }
+
+  function update() {
+    const values = sliders.map(s => s.value / 100);
+    balanceMode ? updateBalance(values) : updateScore(values);
     sliders.forEach(s => s.setAttribute('aria-valuetext', describe(s)));
   }
   sliders.forEach(s => s.addEventListener('input', update));
@@ -275,7 +331,7 @@
 
   function render() {
     if (!view.w) return;
-    const { width: fw, height: fh } = mirror.getBoundingClientRect();
+    const fw = mirror.clientWidth, fh = mirror.clientHeight;   // layout size, ignores the beam's tilt
     view.zoom = Math.min(4, Math.max(1, view.zoom));
     const scale = Math.max(fw / view.w, fh / view.h) * view.zoom;   // "cover" the frame, then zoom
     const maxX = Math.max(0, (view.w * scale - fw) / 2);
@@ -285,7 +341,7 @@
     photo.style.transform = `translate(-50%, -50%) translate(${view.x}px, ${view.y}px) scale(${scale})`;
     if (scale !== view.scale) { view.scale = scale; applyPhotoFilter(); }
   }
-  window.addEventListener('resize', render);
+  window.addEventListener('resize', () => { render(); layoutBeam(); });
 
   const pointers = new Map();
   let pinch = null;
@@ -337,6 +393,7 @@
     render();
   }, { passive: false });
 
+  layoutBeam();
   update();
   const saved = sessionGet();
   if (saved) showPhoto(saved);

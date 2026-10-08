@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<title>Push or Pull</title>
+<link rel="stylesheet" href="/shared/mirror.css">
+<link rel="stylesheet" href="/shared/tools.css">
+<style>
+  :root {
+    --tell: #a2373a;
+    --ask: #5b6ee8;
+  }
+  .styles {
+    width: 100%;
+    max-width: 880px;
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px 56px;
+  }
+  .style-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0 0 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: #333;
+  }
+  .style-word { font-size: 22px; text-transform: none; letter-spacing: 0; }
+  .push .style-word { color: var(--tell); }
+  .pull .style-word { color: var(--ask); }
+
+  .behavior { margin-top: 16px; }
+  .behavior-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .num {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #3a3d42;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .behavior-scale {
+    display: flex;
+    justify-content: space-between;
+    margin-top: -2px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+
+  /* "How often" tracks fill from pale gray toward the side's color */
+  .push input[type=range]::-webkit-slider-runnable-track { background: var(--notch), linear-gradient(90deg, #eceef1, var(--tell)); }
+  .pull input[type=range]::-webkit-slider-runnable-track { background: var(--notch), linear-gradient(90deg, #eceef1, var(--ask)); }
+  .push input[type=range]::-moz-range-track { background: var(--notch), linear-gradient(90deg, #eceef1, var(--tell)); }
+  .pull input[type=range]::-moz-range-track { background: var(--notch), linear-gradient(90deg, #eceef1, var(--ask)); }
+
+  @media (max-width: 620px) {
+    .styles { grid-template-columns: 1fr; }
+    .style-head { font-size: 22px; }
+    .style-word { font-size: 19px; }
+    .behavior-name { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>How do I influence others?</h1>
+
+  <div class="stage" data-mirror data-mode="balance"></div>
+
+  <section class="styles" data-scales aria-label="How often do I use each influence style?">
+    <div class="style-col push">
+      <h2 class="style-head">Push <span class="style-word">Tell</span></h2>
+      <div class="behavior">
+        <span class="behavior-name"><span class="num" aria-hidden="true">1</span>Giving Views &amp; Opinions</span>
+        <input type="range" min="0" max="100" value="50" data-side="push" data-lo="Rarely" data-hi="Often" data-mid="Sometimes" aria-label="How often: giving views and opinions">
+        <div class="behavior-scale" aria-hidden="true"><span>Rarely</span><span>Often</span></div>
+      </div>
+      <div class="behavior">
+        <span class="behavior-name"><span class="num" aria-hidden="true">2</span>Stating Needs &amp; Wants</span>
+        <input type="range" min="0" max="100" value="50" data-side="push" data-lo="Rarely" data-hi="Often" data-mid="Sometimes" aria-label="How often: stating needs and wants">
+        <div class="behavior-scale" aria-hidden="true"><span>Rarely</span><span>Often</span></div>
+      </div>
+      <div class="behavior">
+        <span class="behavior-name"><span class="num" aria-hidden="true">3</span>Using Incentive &amp; Pressure</span>
+        <input type="range" min="0" max="100" value="50" data-side="push" data-lo="Rarely" data-hi="Often" data-mid="Sometimes" aria-label="How often: using incentive and pressure">
+        <div class="behavior-scale" aria-hidden="true"><span>Rarely</span><span>Often</span></div>
+      </div>
+    </div>
+
+    <div class="style-col pull">
+      <h2 class="style-head">Pull <span class="style-word">Ask</span></h2>
+      <div class="behavior">
+        <span class="behavior-name"><span class="num" aria-hidden="true">1</span>Active Listening</span>
+        <input type="range" min="0" max="100" value="50" data-side="pull" data-lo="Rarely" data-hi="Often" data-mid="Sometimes" aria-label="How often: active listening">
+        <div class="behavior-scale" aria-hidden="true"><span>Rarely</span><span>Often</span></div>
+      </div>
+      <div class="behavior">
+        <span class="behavior-name"><span class="num" aria-hidden="true">2</span>Drawing Out</span>
+        <input type="range" min="0" max="100" value="50" data-side="pull" data-lo="Rarely" data-hi="Often" data-mid="Sometimes" aria-label="How often: drawing out">
+        <div class="behavior-scale" aria-hidden="true"><span>Rarely</span><span>Often</span></div>
+      </div>
+      <div class="behavior">
+        <span class="behavior-name"><span class="num" aria-hidden="true">3</span>Building Common Ground</span>
+        <input type="range" min="0" max="100" value="50" data-side="pull" data-lo="Rarely" data-hi="Often" data-mid="Sometimes" aria-label="How often: building common ground">
+        <div class="behavior-scale" aria-hidden="true"><span>Rarely</span><span>Often</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="link" type="button" id="reset">Reset sliders</button>
+  </div>
+
+  <p class="privacy"></p>
+</main>
+<script src="/shared/vendor/qrcode-generator-1.4.4.js"></script>
+<script src="/shared/tools.js"></script>
+<script src="/shared/mirror.js"></script>
+</body>
+</html>
