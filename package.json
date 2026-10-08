@@ -1,0 +1,15 @@
+{
+  "name": "giant-tools",
+  "private": true,
+  "description": "Interactive versions of GiANT leadership tools. Static pages only.",
+  "scripts": {
+    "start": "serve public -l tcp://0.0.0.0:${PORT:-3000}",
+    "dev": "serve public -l 3000"
+  },
+  "dependencies": {
+    "serve": "14.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
