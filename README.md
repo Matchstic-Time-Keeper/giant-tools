@@ -9,7 +9,9 @@ Kept fully separate from the Matchstic Time Tracker (its own repo and its own Ra
 ```
 public/
   index.html               landing page listing the tools
+  shared/                  mirror.css + mirror.js: the mirror, fog, glow, meter and photo handling
   leadership-mirror/       one folder per tool, served at /<folder>/
+  resistant-responsive/
   serve.json               static server config (clean URLs, no-index headers)
   robots.txt               keeps search engines out
 drafts/                    local experiments, not committed or deployed
@@ -26,9 +28,14 @@ Then open http://localhost:3000.
 
 ## Add a new tool
 
-1. Create `public/<tool-name>/index.html` (keep `<meta name="robots" content="noindex, nofollow">` in the head).
+1. Copy an existing tool's `index.html` into `public/<tool-name>/` and change the question and sliders. The page only holds its own content; `/shared/mirror.js` builds the mirror. Keep `<meta name="robots" content="noindex, nofollow">` in the head.
+   - Optional: a `.poles` header and `data-mid` center word (see `resistant-responsive`).
 2. Add a card for it in `public/index.html`.
 3. Commit and push to `main`. Railway deploys automatically.
+
+## Photo privacy
+
+Photos never leave the device. A downscaled copy is kept in `sessionStorage` so it follows the person between tools in the same tab; the browser clears it when the tab or window closes, and "Forget my photo" clears it immediately.
 
 ## Deploy
 

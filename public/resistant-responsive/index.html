@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<title>Resistant or Responsive</title>
+<link rel="stylesheet" href="/shared/mirror.css">
+</head>
+<body>
+<main>
+  <h1>How responsive am I?</h1>
+
+  <div class="stage" data-mirror data-meter-label="Influence"></div>
+
+  <section class="scales with-center" aria-label="Self-assessment, from Resistant to Responsive. The midpoint is Guarded.">
+    <div class="poles" aria-hidden="true">
+      <span class="pole lo">
+        Resistant
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="m8.5 8.5 7 7m0-7-7 7"/></svg>
+      </span>
+      <span class="pole mid">
+        <svg viewBox="0 0 44 10"><path d="M44 5H3" stroke="#b3312f" stroke-width="2"/><path d="M0 5 7 1v8z" fill="#b3312f"/></svg>
+        Guarded
+        <svg viewBox="0 0 44 10"><path d="M0 5h41" stroke="#3a8b3a" stroke-width="2"/><path d="M44 5 37 1v8z" fill="#3a8b3a"/></svg>
+      </span>
+      <span class="pole hi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>
+        Responsive
+      </span>
+    </div>
+    <div class="scale">
+      <span class="lo">Insecure</span>
+      <input type="range" min="0" max="100" value="50" data-lo="Insecure" data-hi="Secure" data-mid="Guarded" aria-label="Insecure to Secure">
+      <span class="hi">Secure</span>
+    </div>
+    <div class="scale">
+      <span class="lo">Arrogant</span>
+      <input type="range" min="0" max="100" value="50" data-lo="Arrogant" data-hi="Confident" data-mid="Guarded" aria-label="Arrogant to Confident">
+      <span class="hi">Confident</span>
+    </div>
+    <div class="scale">
+      <span class="lo">Prideful</span>
+      <input type="range" min="0" max="100" value="50" data-lo="Prideful" data-hi="Humble" data-mid="Guarded" aria-label="Prideful to Humble">
+      <span class="hi">Humble</span>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="link" type="button" id="reset">Reset sliders</button>
+  </div>
+
+  <p class="privacy"></p>
+</main>
+<script src="/shared/mirror.js"></script>
+</body>
+</html>

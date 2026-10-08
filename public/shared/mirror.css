@@ -1,0 +1,309 @@
+/* Shared styles for GiANT Tools mirror pages. */
+
+:root {
+  --ink: #111;
+  --muted: #6b7280;
+  --bg: #fff;
+  --frame: #a9a9a9;
+  --track: linear-gradient(90deg, #a2373a 0%, #c8732f 25%, #e8b53c 50%, #8fa53a 75%, #3a8b3a 100%);
+  --notch: linear-gradient(rgba(255,255,255,.95), rgba(255,255,255,.95)) center / 3px 100% no-repeat;
+  --red: #b3312f;
+  --green: #3a8b3a;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+h1 {
+  font-size: clamp(22px, 5.2vw, 36px);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+  margin: 8px 0 28px;
+  text-wrap: balance;
+}
+
+/* ---------- Mirror ---------- */
+.mirror {
+  position: relative;
+  width: min(52vw, 240px);
+  aspect-ratio: 172 / 246;
+  border-radius: 22px;
+  border: 2px solid var(--frame);
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(45deg, #ffffff 0%, #eef6fd 45%, #d9ecfb 100%);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+}
+.mirror:focus-visible { outline: 3px solid #2f6fdf; outline-offset: 3px; }
+.mirror.has-photo { cursor: grab; }
+.mirror.dragging { cursor: grabbing; }
+
+.photo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  max-width: none;
+  transform-origin: center;
+  pointer-events: none;
+  will-change: transform;
+  display: none;
+}
+.has-photo .photo { display: block; }
+
+.mirror { transition: box-shadow .2s ease; }
+
+/* ---------- Influence meter ---------- */
+.stage {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;   /* keeps the mirror centered */
+  column-gap: 18px;
+  width: 100%;
+}
+.stage .mirror { grid-column: 2; }
+.meter {
+  grid-column: 3;
+  justify-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.meter-arrow { width: 12px; height: 8px; fill: #3a8b3a; }
+.meter-track {
+  position: relative;
+  flex: 1;
+  width: 18px;
+  border-radius: 9px;
+  background: #e8eaee;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.15);
+}
+/* The full gradient is always there; the clip reveals it from the bottom up */
+.meter-fill {
+  --level: .5;
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+  background: linear-gradient(0deg, #a2373a 0%, #c8732f 25%, #e8b53c 50%, #8fa53a 75%, #3a8b3a 100%);
+  clip-path: inset(calc((1 - var(--level)) * 100%) 0 0 0 round 9px);
+  transition: clip-path .25s ease;
+}
+.meter-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #374151;
+}
+.photo { transition: filter .2s ease; }
+
+/* Fog: condensation on the glass; heavy at low scores, gone by mid-green */
+.fog, .shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.fog {
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(255,255,255,.55), rgba(255,255,255,.8) 75%),
+    linear-gradient(45deg, rgba(240,246,252,.6), rgba(214,232,248,.7));
+}
+/* Shine: a clean highlight once the glass is fully clear. Sits in the lower
+   third so it streaks across the shoulders, not the face. */
+.shine { background: linear-gradient(155deg, transparent 64%, rgba(255,255,255,.6) 76%, transparent 88%); }
+
+/* Glass sits over everything so it still reads as a mirror */
+.glass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(45deg, rgba(255,255,255,.1) 0%, rgba(225,240,253,.18) 45%, rgba(190,224,250,.42) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), inset 0 0 24px rgba(160,200,235,.35);
+  opacity: 0;
+}
+.has-photo .glass { opacity: 1; }
+
+.glare {
+  position: absolute;
+  top: 6%;
+  right: 5%;
+  width: 30%;
+  pointer-events: none;
+}
+
+.empty-hint {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.3;
+  pointer-events: none;
+}
+.empty-hint svg { width: 32px; height: 32px; opacity: .7; }
+.has-photo .empty-hint { display: none; }
+
+.photo-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 14px;
+  margin-top: 14px;
+  min-height: 32px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.photo-tools[hidden] { display: none; }
+
+button.link {
+  font: inherit;
+  font-weight: 600;
+  color: #2f5fb3;
+  background: none;
+  border: 0;
+  padding: 6px 4px;
+  cursor: pointer;
+}
+button.link:hover { text-decoration: underline; }
+
+/* ---------- Sliders ---------- */
+.scales {
+  width: 100%;
+  max-width: 880px;
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  column-gap: 22px;
+  row-gap: 22px;
+}
+.scale { display: contents; }
+.scale .lo, .scale .hi { font-weight: 700; font-size: 22px; }
+.scale .lo { text-align: right; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+input[type=range]:focus-visible { outline: 3px solid #2f6fdf; outline-offset: 2px; border-radius: 12px; }
+input[type=range]::-webkit-slider-runnable-track {
+  height: 18px;
+  border-radius: 9px;
+  background: var(--track);
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 36px;
+  height: 36px;
+  margin-top: -9px;
+  border-radius: 50%;
+  background: #ececec;
+  border: 1px solid #b9b9b9;
+  box-shadow: 0 5px 10px rgba(0,0,0,.18);
+}
+input[type=range]::-moz-range-track {
+  height: 18px;
+  border-radius: 9px;
+  background: var(--track);
+}
+input[type=range]::-moz-range-thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ececec;
+  border: 1px solid #b9b9b9;
+  box-shadow: 0 5px 10px rgba(0,0,0,.18);
+}
+
+.actions { margin-top: 22px; }
+.privacy { margin-top: 28px; font-size: 12px; color: var(--muted); text-align: center; }
+
+/* ---------- Optional: pole header + center word (e.g. Resistant / Guarded / Responsive) ---------- */
+.poles { display: contents; }
+.pole {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -.01em;
+}
+.pole svg { width: 26px; height: 26px; flex: none; }
+.pole.lo { justify-content: flex-end; color: var(--red); }
+.pole.hi { color: var(--green); }
+.pole.mid {
+  justify-content: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #4b5563;
+}
+.pole.mid svg { width: 44px; height: 10px; }
+
+/* A white notch marks the neutral midpoint on each track */
+.with-center input[type=range]::-webkit-slider-runnable-track { background: var(--notch), var(--track); }
+.with-center input[type=range]::-moz-range-track { background: var(--notch), var(--track); }
+
+/* Phone: labels sit above each bar */
+@media (max-width: 620px) {
+  .scales {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    margin-top: 32px;
+  }
+  .scale {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "lo hi" "bar bar";
+  }
+  .scale .lo { grid-area: lo; }
+  .scale .hi { grid-area: hi; }
+  .scale .lo, .scale .hi { font-size: 17px; }
+  .scale .lo { text-align: left; }
+  .scale .hi { text-align: right; }
+  .scale input { grid-area: bar; }
+  .poles {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    margin-bottom: 2px;
+  }
+  .pole { font-size: 19px; gap: 5px; }
+  .pole svg { width: 18px; height: 18px; }
+  .pole.lo { justify-content: flex-start; }
+  .pole.hi { justify-content: flex-end; }
+  .pole.mid { font-size: 11px; }
+  .pole.mid svg { display: none; }
+}
