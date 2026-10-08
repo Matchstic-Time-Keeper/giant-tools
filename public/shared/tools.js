@@ -23,10 +23,12 @@
       question: 'Am I a balanced leader?',
       description: 'Am I a balanced leader? See whether you lean toward telling or asking.',
       glow: 'balance',
+      letter: 'P',
+      letterColor: '#7d4fb0',   // balance purple, between Tell red and Ask blue
     },
   ];
 
-  const icon = t => `<span class="tool-icon${t.glow ? ` glow-${t.glow}` : ''}" aria-hidden="true">${t.letter ? `<span class="tool-letter">${t.letter}</span>` : ''}</span>`;
+  const icon = t => `<span class="tool-icon${t.glow ? ` glow-${t.glow}` : ''}" aria-hidden="true">${t.letter ? `<span class="tool-letter"${t.letterColor ? ` style="color:${t.letterColor}"` : ''}>${t.letter}</span>` : ''}</span>`;
 
   const card = (t, { compact = false, current = false } = {}) => `
     <li>

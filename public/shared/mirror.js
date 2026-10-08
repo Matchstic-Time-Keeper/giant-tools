@@ -70,8 +70,8 @@
       <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
       <span class="meter-label">${meterLabel}</span>
     </div>`;
-  // The framing hint and privacy note sit behind a "?" button (always visible, so the note can
-  // be read before uploading). data-photo-help="inline" shows them as plain text instead.
+  // The framing hint and privacy note sit behind a "?" button that appears with the photo.
+  // data-photo-help="inline" shows them as plain text instead.
   const helpTip = stage.dataset.photoHelp !== 'inline';
   const PRIVACY_TEXT = 'Your photo never leaves this device. It is kept only while this browser tab is open, ' +
     'so you can use it across tools, and is cleared when you close the tab or window.';
@@ -79,7 +79,7 @@
   stage.insertAdjacentHTML('afterend', helpTip ? `
     <div class="photo-tools with-help" id="photoTools">
       <button class="link photo-only" type="button" id="changePhoto">Change photo</button>
-      <span class="help">
+      <span class="help photo-only">
         <button class="help-btn" type="button" aria-label="Photo tips and privacy" aria-expanded="false" aria-describedby="photoHelp">?</button>
         <span class="help-tip" role="tooltip" id="photoHelp">
           <span class="help-tip-line"><strong>Framing:</strong> ${FRAMING_TEXT}.</span>
@@ -288,9 +288,12 @@
 
   const hasPhoto = () => mirror.classList.contains('has-photo');
 
-  // Inline mode hides the whole row without a photo; tooltip mode keeps the "?" visible
+  // Change photo, the "?" and Forget my photo show only while there is a photo
   function setPhotoTools(on) {
-    if (helpTip) photoTools.classList.toggle('has-photo', on);
+    if (helpTip) {
+      photoTools.classList.toggle('has-photo', on);
+      if (!on) photoTools.querySelector('.help').classList.remove('open');   // don't reappear already open
+    }
     else photoTools.hidden = !on;
   }
   const openPicker = () => fileInput.click();
