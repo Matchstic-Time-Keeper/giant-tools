@@ -25,7 +25,8 @@
   .lede { color: var(--muted); margin: 0 0 32px; font-size: 16px; line-height: 1.5; }
   .bar { height: 8px; border-radius: 4px; background: var(--track); margin-bottom: 32px; max-width: 220px; }
   ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
-  footer { margin-top: 40px; font-size: 12px; color: var(--muted); }
+  .landing-qr { margin-top: 36px; display: flex; justify-content: center; }
+  footer { margin-top: 32px; font-size: 12px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -36,8 +37,11 @@
 
   <ul data-tool-list></ul>
 
+  <div class="landing-qr" data-tool-qr></div>
+
   <footer>Photos and answers stay on your device. Nothing is uploaded.</footer>
 </main>
+<script src="/shared/vendor/qrcode-generator-1.4.4.js"></script>
 <script src="/shared/tools.js"></script>
 </body>
 </html>

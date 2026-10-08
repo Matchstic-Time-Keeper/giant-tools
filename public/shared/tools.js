@@ -1,6 +1,6 @@
-// The list of GiANT tools, and the two places it is shown:
-//   - the landing page grid:  <ul data-tool-list></ul>
-//   - the left "Tools" navigation on every tool page (added automatically)
+// The list of GiANT tools, and the places it is shown:
+//   - the landing page grid:  <ul data-tool-list></ul>, plus a QR code in <div data-tool-qr>
+//   - the left "Tools" navigation on every tool page (added automatically), with a QR code
 // To add a tool, add an entry here.
 (() => {
   const TOOLS = [
@@ -9,6 +9,7 @@
       name: 'Leadership Mirror',
       question: 'What is it like to be on the other side of me?',
       description: 'What is it like to be on the other side of me? Place your photo in the mirror and assess yourself.',
+      figure: 'headshot',
     },
     {
       slug: 'resistant-responsive',
@@ -28,7 +29,13 @@
     },
   ];
 
-  const icon = t => `<span class="tool-icon${t.glow ? ` glow-${t.glow}` : ''}" aria-hidden="true">${t.letter ? `<span class="tool-letter"${t.letterColor ? ` style="color:${t.letterColor}"` : ''}>${t.letter}</span>` : ''}</span>`;
+  // A soft, out-of-focus head-and-shoulders shape behind the glass
+  const HEADSHOT = `<svg class="tool-figure" viewBox="0 0 34 48" aria-hidden="true">
+    <circle cx="17" cy="20" r="7.5"/><ellipse cx="17" cy="46" rx="14" ry="13"/></svg>`;
+
+  const icon = t => `<span class="tool-icon${t.glow ? ` glow-${t.glow}` : ''}" aria-hidden="true">${
+    t.figure === 'headshot' ? HEADSHOT : ''}${
+    t.letter ? `<span class="tool-letter"${t.letterColor ? ` style="color:${t.letterColor}"` : ''}>${t.letter}</span>` : ''}</span>`;
 
   const card = (t, { compact = false, current = false } = {}) => `
     <li>
@@ -41,18 +48,8 @@
       </a>
     </li>`;
 
-  // Landing page
-  const list = document.querySelector('[data-tool-list]');
-  if (list) list.innerHTML = TOOLS.map(t => card(t)).join('');
-
-  // Tool pages: left navigation (a slide-out panel on narrow screens)
-  const slug = location.pathname.split('/').filter(Boolean)[0];
-  if (!TOOLS.some(t => t.slug === slug)) return;
-
-  const tool = TOOLS.find(t => t.slug === slug);
-  const toolUrl = `${location.origin}/${slug}/`;
-
-  // QR code as crisp SVG squares, with the standard 4-module quiet zone
+  // ---------- QR code ----------
+  // Crisp SVG squares with the standard 4-module quiet zone
   function qrSvg(text) {
     const qr = qrcode(0, 'M');
     qr.addData(text);
@@ -66,6 +63,48 @@
       `<rect width="${size}" height="${size}" fill="#fff"/><path d="${d}" fill="#111"/></svg>`;
   }
 
+  // A small QR thumbnail that expands to a large one; tapping the large one (or Escape) closes it
+  function qrBlock({ url, title, caption }) {
+    const svg = qrSvg(url);
+    return {
+      html: `
+        <div class="qr-block">
+          <button class="qr-thumb" type="button" aria-haspopup="dialog" aria-label="Show a larger QR code for ${title}">${svg}</button>
+          <span class="qr-caption">${caption}</span>
+        </div>`,
+      dialog: `
+        <dialog class="qr-dialog" aria-label="QR code for ${title}">
+          <button class="qr-big" type="button" aria-label="Close QR code">${svg}</button>
+          <p class="qr-dialog-caption"><strong>${title}</strong><span>Scan with your phone camera · tap to close</span></p>
+        </dialog>`,
+    };
+  }
+
+  function wireQr() {
+    const dialog = document.querySelector('.qr-dialog');
+    document.querySelector('.qr-thumb').addEventListener('click', () => dialog.showModal());
+    dialog.addEventListener('click', () => dialog.close());
+    return dialog;
+  }
+
+  // ---------- Landing page ----------
+  const list = document.querySelector('[data-tool-list]');
+  if (list) list.innerHTML = TOOLS.map(t => card(t)).join('');
+
+  const landingQr = document.querySelector('[data-tool-qr]');
+  if (landingQr) {
+    const qr = qrBlock({ url: `${location.origin}/`, title: 'GiANT Tools', caption: 'Scan to open GiANT Tools on your phone' });
+    landingQr.innerHTML = qr.html;
+    document.body.insertAdjacentHTML('beforeend', qr.dialog);
+    wireQr();
+  }
+
+  // ---------- Tool pages: left navigation (a slide-out panel on narrow screens) ----------
+  const slug = location.pathname.split('/').filter(Boolean)[0];
+  const tool = TOOLS.find(t => t.slug === slug);
+  if (!tool) return;
+
+  const qr = qrBlock({ url: `${location.origin}/${slug}/`, title: tool.name, caption: 'Scan to open this tool' });
   document.body.classList.add('has-tool-nav');
   document.body.insertAdjacentHTML('afterbegin', `
     <button class="tool-nav-toggle" type="button" aria-controls="toolNav" aria-expanded="false">
@@ -83,21 +122,14 @@
       <ul class="tool-nav-list">
         ${TOOLS.map(t => card(t, { compact: true, current: t.slug === slug })).join('')}
       </ul>
-      <div class="tool-nav-qr">
-        <button class="qr-thumb" type="button" aria-haspopup="dialog" aria-label="Show a larger QR code for this tool">
-          ${qrSvg(toolUrl)}
-        </button>
-        <span class="qr-caption">Scan to open this tool</span>
-      </div>
+      <div class="tool-nav-qr">${qr.html}</div>
     </nav>
-    <dialog class="qr-dialog" aria-label="QR code for ${tool.name}">
-      <button class="qr-big" type="button" aria-label="Close QR code">${qrSvg(toolUrl)}</button>
-      <p class="qr-dialog-caption"><strong>${tool.name}</strong><span>Scan with your phone camera · tap to close</span></p>
-    </dialog>`);
+    ${qr.dialog}`);
 
   const nav = document.getElementById('toolNav');
   const toggle = document.querySelector('.tool-nav-toggle');
   const scrim = document.querySelector('.tool-nav-scrim');
+  const qrDialog = wireQr();
 
   function setOpen(open) {
     nav.classList.toggle('open', open);
@@ -107,11 +139,6 @@
     else toggle.focus();
   }
   toggle.addEventListener('click', () => setOpen(true));
-
-  // QR: the thumbnail opens a large version; tapping it (or Escape) closes
-  const qrDialog = document.querySelector('.qr-dialog');
-  document.querySelector('.qr-thumb').addEventListener('click', () => qrDialog.showModal());
-  qrDialog.addEventListener('click', () => qrDialog.close());
   nav.querySelector('.tool-nav-close').addEventListener('click', () => setOpen(false));
   scrim.addEventListener('click', () => setOpen(false));
   document.addEventListener('keydown', e => {
