@@ -20,8 +20,8 @@
     {
       slug: 'push-pull',
       name: 'Push or Pull',
-      question: 'How do I influence others?',
-      description: 'How do I influence others? See whether you lean toward telling or asking.',
+      question: 'Am I a balanced leader?',
+      description: 'Am I a balanced leader? See whether you lean toward telling or asking.',
       glow: 'balance',
     },
   ];

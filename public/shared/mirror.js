@@ -54,11 +54,13 @@
     <div class="beam-rig">
       <div class="beam-tilt">
         <div class="beam-slide">${MIRROR_HTML}</div>
-        <div class="beam" aria-hidden="true"></div>
+        <div class="beam-wrap">
+          <div class="beam" aria-hidden="true"></div>
+          <span class="beam-end tell" aria-hidden="true">Tell</span>
+          <span class="beam-end ask" aria-hidden="true">Ask</span>
+        </div>
       </div>
       <div class="fulcrum" aria-hidden="true"></div>
-      <span class="beam-end tell" aria-hidden="true">Tell</span>
-      <span class="beam-end ask" aria-hidden="true">Ask</span>
       <span class="beam-goal" aria-hidden="true">Balanced</span>
       <div class="sr-only" id="beam" role="meter" aria-label="Balance between Tell and Ask"
         aria-valuemin="-100" aria-valuemax="100" aria-valuenow="0"></div>
@@ -68,9 +70,27 @@
       <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
       <span class="meter-label">${meterLabel}</span>
     </div>`;
-  stage.insertAdjacentHTML('afterend', `
+  // The framing hint and privacy note sit behind a "?" button (always visible, so the note can
+  // be read before uploading). data-photo-help="inline" shows them as plain text instead.
+  const helpTip = stage.dataset.photoHelp !== 'inline';
+  const PRIVACY_TEXT = 'Your photo never leaves this device. It is kept only while this browser tab is open, ' +
+    'so you can use it across tools, and is cleared when you close the tab or window.';
+  const FRAMING_TEXT = 'Drag to position · pinch or scroll to zoom';
+  stage.insertAdjacentHTML('afterend', helpTip ? `
+    <div class="photo-tools with-help" id="photoTools">
+      <button class="link photo-only" type="button" id="changePhoto">Change photo</button>
+      <span class="help">
+        <button class="help-btn" type="button" aria-label="Photo tips and privacy" aria-expanded="false" aria-describedby="photoHelp">?</button>
+        <span class="help-tip" role="tooltip" id="photoHelp">
+          <span class="help-tip-line"><strong>Framing:</strong> ${FRAMING_TEXT}.</span>
+          <span class="help-tip-line"><strong>Privacy:</strong> ${PRIVACY_TEXT}</span>
+        </span>
+      </span>
+      <button class="link photo-only" type="button" id="forgetPhoto">Forget my photo</button>
+    </div>
+    <input type="file" id="file" accept="image/*" hidden>` : `
     <div class="photo-tools" id="photoTools" hidden>
-      <span>Drag to position · pinch or scroll to zoom</span>
+      <span>${FRAMING_TEXT}</span>
       <button class="link" type="button" id="changePhoto">Change photo</button>
       <button class="link" type="button" id="forgetPhoto">Forget my photo</button>
     </div>
@@ -78,8 +98,18 @@
 
   const privacy = document.querySelector('.privacy');
   if (privacy) {
-    privacy.textContent = 'Your photo never leaves this device. It is kept only while this browser tab is open, ' +
-      'so you can use it across tools, and is cleared when you close the tab or window.';
+    privacy.textContent = PRIVACY_TEXT;
+    privacy.hidden = helpTip;
+  }
+
+  // The tooltip opens on hover or focus (CSS) and on tap, and closes on Escape or a tap elsewhere
+  if (helpTip) {
+    const help = document.querySelector('.help');
+    const helpBtn = help.querySelector('.help-btn');
+    const setHelp = open => { help.classList.toggle('open', open); helpBtn.setAttribute('aria-expanded', open); };
+    helpBtn.addEventListener('click', e => { e.stopPropagation(); setHelp(!help.classList.contains('open')); });
+    document.addEventListener('click', e => { if (!help.contains(e.target)) setHelp(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') setHelp(false); });
   }
 
   // ---------- Color: sample the slider gradient and blend in OKLab ----------
@@ -257,6 +287,12 @@
   }
 
   const hasPhoto = () => mirror.classList.contains('has-photo');
+
+  // Inline mode hides the whole row without a photo; tooltip mode keeps the "?" visible
+  function setPhotoTools(on) {
+    if (helpTip) photoTools.classList.toggle('has-photo', on);
+    else photoTools.hidden = !on;
+  }
   const openPicker = () => fileInput.click();
 
   mirror.addEventListener('click', () => { if (!hasPhoto()) openPicker(); });
@@ -276,7 +312,7 @@
       mirror.classList.add('has-photo');
       mirror.removeAttribute('role');
       mirror.setAttribute('aria-label', 'Your photo in the mirror');
-      photoTools.hidden = false;
+      setPhotoTools(true);
       render();
       applyPhotoFilter();
     };
@@ -295,7 +331,7 @@
     mirror.classList.remove('has-photo');
     mirror.setAttribute('role', 'button');
     mirror.setAttribute('aria-label', 'Add your photo');
-    photoTools.hidden = true;
+    setPhotoTools(false);
     mirror.focus();
   }
 
