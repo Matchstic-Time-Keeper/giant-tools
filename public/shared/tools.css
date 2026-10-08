@@ -1,0 +1,160 @@
+/* Tool cards (landing page + left navigation) and the navigation layout. */
+
+:root {
+  --nav-width: 260px;
+  --line: #e5e7eb;
+}
+
+/* ---------- Cards ---------- */
+.tool-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tool-card:hover { border-color: #c7ccd4; box-shadow: 0 4px 14px rgba(0,0,0,.06); }
+.tool-card:focus-visible { outline: 3px solid #2f6fdf; outline-offset: 2px; }
+.tool-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tool-name { font-size: 18px; font-weight: 700; }
+.tool-desc { color: #6b7280; font-size: 14px; line-height: 1.4; }
+
+/* Mirror thumbnail, optionally with a letter in the glass */
+.tool-icon {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 48px;
+  border-radius: 8px;
+  border: 1.5px solid #a9a9a9;
+  background: linear-gradient(45deg, #fff 0%, #eef6fd 45%, #d9ecfb 100%);
+  box-shadow: 0 0 10px 2px rgba(58,139,58,.35);
+}
+.tool-letter {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  color: #3a8b3a;
+  letter-spacing: -.02em;
+}
+
+/* Compact cards in the navigation column */
+.tool-card.compact { gap: 12px; padding: 10px 12px; border-radius: 12px; }
+.tool-card.compact .tool-icon { width: 26px; height: 37px; border-radius: 6px; box-shadow: 0 0 7px 1px rgba(58,139,58,.3); }
+.tool-card.compact .tool-letter { font-size: 23px; }
+.tool-card.compact .tool-name { font-size: 14px; }
+.tool-card.compact .tool-desc {
+  font-size: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tool-card[aria-current="page"] {
+  border-color: #3a8b3a;
+  box-shadow: inset 3px 0 0 #3a8b3a;
+}
+
+/* ---------- Left navigation ---------- */
+.tool-nav {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  width: var(--nav-width);
+  display: flex;
+  flex-direction: column;
+  background: #f7f8fa;
+  border-right: 1px solid var(--line);
+}
+.tool-nav-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 16px 12px 20px;
+}
+.tool-nav-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111;
+  text-decoration: none;
+}
+.tool-nav-title:hover { text-decoration: underline; }
+.tool-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 12px 20px;
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.tool-nav-close, .tool-nav-toggle {
+  font: inherit;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: #111;
+}
+.tool-nav-close { display: none; width: 34px; height: 34px; border-radius: 8px; padding: 7px; }
+.tool-nav-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px 7px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.tool-nav-toggle svg, .tool-nav-close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.tool-nav-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: rgba(17,24,39,.35);
+}
+.tool-nav-scrim[hidden] { display: none; }
+
+body.has-tool-nav { padding-left: var(--nav-width); }
+
+/* Narrow screens: the column becomes a slide-out panel */
+@media (max-width: 899px) {
+  body.has-tool-nav { padding-left: 0; }
+  body.has-tool-nav main { padding-top: 60px; }
+  .tool-nav-toggle { display: inline-flex; }
+  .tool-nav-close { display: block; }
+  .tool-nav {
+    width: min(300px, 85vw);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform .2s ease, visibility 0s linear .2s;
+    box-shadow: 0 0 30px rgba(0,0,0,.18);
+  }
+  .tool-nav.open {
+    transform: none;
+    visibility: visible;
+    transition: transform .2s ease;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-nav, .tool-nav.open { transition: none; }
+}

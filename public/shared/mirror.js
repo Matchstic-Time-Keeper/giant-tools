@@ -128,6 +128,15 @@
 
   // ---------- Sliders ----------
   const sliders = [...document.querySelectorAll('.scales input[type=range]')];
+
+  // A slider with data-mid gets its center word shown under the midpoint
+  sliders.filter(s => s.dataset.mid).forEach(s => {
+    const track = document.createElement('div');
+    track.className = 'track';
+    s.replaceWith(track);
+    track.append(s);
+    track.insertAdjacentHTML('beforeend', `<span class="mid-word" aria-hidden="true">${s.dataset.mid}</span>`);
+  });
   const mirror = document.getElementById('mirror');
   const fogLayer = document.getElementById('fog');
   const shine = document.getElementById('shine');

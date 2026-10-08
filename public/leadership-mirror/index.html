@@ -7,6 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Leadership Mirror</title>
 <link rel="stylesheet" href="/shared/mirror.css">
+<link rel="stylesheet" href="/shared/tools.css">
 </head>
 <body>
 <main>
@@ -14,20 +15,20 @@
 
   <div class="stage" data-mirror data-meter-label="Influence"></div>
 
-  <section class="scales" aria-label="Self-assessment">
+  <section class="scales with-center" aria-label="Self-assessment">
     <div class="scale">
       <span class="lo">Reactive</span>
-      <input type="range" min="0" max="100" value="50" data-lo="Reactive" data-hi="Proactive" aria-label="Reactive to Proactive">
+      <input type="range" min="0" max="100" value="50" data-lo="Reactive" data-hi="Proactive" data-mid="Attentive" aria-label="Reactive to Proactive">
       <span class="hi">Proactive</span>
     </div>
     <div class="scale">
       <span class="lo">Accidental</span>
-      <input type="range" min="0" max="100" value="50" data-lo="Accidental" data-hi="Intentional" aria-label="Accidental to Intentional">
+      <input type="range" min="0" max="100" value="50" data-lo="Accidental" data-hi="Intentional" data-mid="Habitual" aria-label="Accidental to Intentional">
       <span class="hi">Intentional</span>
     </div>
     <div class="scale">
       <span class="lo">Inconsistent</span>
-      <input type="range" min="0" max="100" value="50" data-lo="Inconsistent" data-hi="Consistent" aria-label="Inconsistent to Consistent">
+      <input type="range" min="0" max="100" value="50" data-lo="Inconsistent" data-hi="Consistent" data-mid="Situational" aria-label="Inconsistent to Consistent">
       <span class="hi">Consistent</span>
     </div>
   </section>
@@ -38,6 +39,7 @@
 
   <p class="privacy"></p>
 </main>
+<script src="/shared/tools.js"></script>
 <script src="/shared/mirror.js"></script>
 </body>
 </html>

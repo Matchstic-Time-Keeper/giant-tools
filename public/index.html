@@ -6,11 +6,11 @@
 <meta name="color-scheme" content="light">
 <meta name="robots" content="noindex, nofollow">
 <title>GiANT Tools</title>
+<link rel="stylesheet" href="/shared/tools.css">
 <style>
   :root {
     --ink: #111;
     --muted: #6b7280;
-    --line: #e5e7eb;
     --track: linear-gradient(90deg, #a2373a 0%, #c8732f 25%, #e8b53c 50%, #8fa53a 75%, #3a8b3a 100%);
   }
   * { box-sizing: border-box; }
@@ -25,30 +25,6 @@
   .lede { color: var(--muted); margin: 0 0 32px; font-size: 16px; line-height: 1.5; }
   .bar { height: 8px; border-radius: 4px; background: var(--track); margin-bottom: 32px; max-width: 220px; }
   ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
-  a.tool {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 18px 20px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    color: inherit;
-    text-decoration: none;
-    transition: border-color .15s ease, box-shadow .15s ease;
-  }
-  a.tool:hover { border-color: #c7ccd4; box-shadow: 0 4px 14px rgba(0,0,0,.06); }
-  a.tool:focus-visible { outline: 3px solid #2f6fdf; outline-offset: 2px; }
-  .icon {
-    flex: none;
-    width: 34px;
-    height: 48px;
-    border-radius: 8px;
-    border: 1.5px solid #a9a9a9;
-    background: linear-gradient(45deg, #fff 0%, #eef6fd 45%, #d9ecfb 100%);
-    box-shadow: 0 0 10px 2px rgba(58,139,58,.35);
-  }
-  .tool h2 { font-size: 18px; margin: 0 0 4px; }
-  .tool p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
   footer { margin-top: 40px; font-size: 12px; color: var(--muted); }
 </style>
 </head>
@@ -58,28 +34,10 @@
   <p class="lede">Interactive versions of GiANT leadership tools for workshops and personal reflection.</p>
   <div class="bar" aria-hidden="true"></div>
 
-  <ul>
-    <li>
-      <a class="tool" href="/leadership-mirror/">
-        <span class="icon" aria-hidden="true"></span>
-        <span>
-          <h2>Leadership Mirror</h2>
-          <p>What is it like to be on the other side of me? Place your photo in the mirror and assess yourself.</p>
-        </span>
-      </a>
-    </li>
-    <li>
-      <a class="tool" href="/resistant-responsive/">
-        <span class="icon" aria-hidden="true"></span>
-        <span>
-          <h2>Resistant or Responsive</h2>
-          <p>How responsive am I? Assess how secure, confident and humble you are.</p>
-        </span>
-      </a>
-    </li>
-  </ul>
+  <ul data-tool-list></ul>
 
-  <footer>Photos and answers stay on your device. Nothing is uploaded or saved.</footer>
+  <footer>Photos and answers stay on your device. Nothing is uploaded.</footer>
 </main>
+<script src="/shared/tools.js"></script>
 </body>
 </html>
