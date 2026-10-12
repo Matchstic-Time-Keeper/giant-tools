@@ -6,6 +6,9 @@
 //   <button id="reset">, <p class="privacy">
 // and this script builds the mirror + meter, wires the sliders, and handles the photo.
 //
+// data-score-label="…" adds the average rating to the left of the mirror (e.g. Active Listening Score).
+// Sliders can use any min/max (e.g. 1–10); 1 maps to the red end, 10 to the green.
+//
 // Balance mode (data-mode="balance", e.g. Push / Pull): sliders sit in [data-scales] and
 // carry data-side="push" | "pull". The mirror rides a beam with Tell and Ask at its ends
 // instead of the meter.
@@ -64,7 +67,12 @@
       <span class="beam-goal" aria-hidden="true">Balanced</span>
       <div class="sr-only" id="beam" role="meter" aria-label="Balance between Tell and Ask"
         aria-valuemin="-100" aria-valuemax="100" aria-valuenow="0"></div>
-    </div>` : `${MIRROR_HTML}
+    </div>` : `${stage.dataset.scoreLabel ? `
+    <div class="score" id="score" role="status" aria-live="polite">
+      <span class="score-value" id="scoreValue">–</span>
+      <span class="score-label">${stage.dataset.scoreLabel}</span>
+      <span class="score-scale" id="scoreScale"></span>
+    </div>` : ''}${MIRROR_HTML}
     <div class="meter" id="meter" role="meter" aria-label="${meterLabel}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
       <svg class="meter-arrow" viewBox="0 0 12 8" aria-hidden="true"><path d="M6 0 12 8H0z"/></svg>
       <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
@@ -202,6 +210,7 @@
 
   function describe(el) {
     const v = +el.value;
+    if (!el.dataset.lo) return `${v} out of ${el.max}`;
     if (v === 50) return `${v}, ${el.dataset.mid || 'balanced'}`;
     return `${v}, leaning ${v < 50 ? el.dataset.lo : el.dataset.hi}`;
   }
@@ -235,6 +244,7 @@
 
     const pct = Math.round(avg * 100);
     meterFill.style.setProperty('--level', avg.toFixed(3));
+    showScore(avg);
     meter.setAttribute('aria-valuenow', pct);
     meter.setAttribute('aria-valuetext', `${meterLabel} ${pct} percent`);
   }
@@ -256,6 +266,18 @@
       : `Leaning ${pct < 0 ? 'Tell' : 'Ask'}, ${Math.abs(pct)} percent`);
   }
 
+  // Average of the raw ratings (e.g. 1–10), colored along the same red → green scale
+  const scoreValue = document.getElementById('scoreValue');
+  function showScore(level) {
+    if (!scoreValue) return;
+    const raw = mean(sliders.map(s => +s.value));
+    const max = Math.max(...sliders.map(s => +s.max));
+    scoreValue.textContent = raw.toFixed(1);
+    const [L, a, b] = colorAt(level);
+    scoreValue.style.color = `rgb(${oklabToRgb([Math.min(L, .62), a, b]).join(',')})`;   // darkened so yellow reads on white
+    document.getElementById('scoreScale').textContent = `out of ${max}`;
+  }
+
   // How far the mirror can slide before reaching the end of the beam
   function layoutBeam() {
     if (!balanceMode) return;
@@ -264,13 +286,13 @@
   }
 
   function update() {
-    const values = sliders.map(s => s.value / 100);
+    const values = sliders.map(s => (s.value - s.min) / (s.max - s.min));   // 0 … 1 whatever the range
     balanceMode ? updateBalance(values) : updateScore(values);
     sliders.forEach(s => s.setAttribute('aria-valuetext', describe(s)));
   }
   sliders.forEach(s => s.addEventListener('input', update));
   document.getElementById('reset')?.addEventListener('click', () => {
-    sliders.forEach(s => { s.value = 50; });
+    sliders.forEach(s => { s.value = s.defaultValue; });   // back to each slider's starting value
     update();
   });
 

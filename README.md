@@ -14,6 +14,7 @@ public/
   leadership-mirror/       one folder per tool, served at /<folder>/
   resistant-responsive/
   push-pull/               balance mode: the mirror rides a Tell ↔ Ask beam
+  active-listening/        1–10 ratings with an average score left of the mirror
   serve.json               static server config (clean URLs, no-index headers)
   robots.txt               keeps search engines out
 drafts/                    local experiments, not committed or deployed
@@ -32,6 +33,7 @@ Then open http://localhost:3000.
 
 1. Copy an existing tool's `index.html` into `public/<tool-name>/` and change the question and sliders. The page only holds its own content; `/shared/mirror.js` builds the mirror. Keep `<meta name="robots" content="noindex, nofollow">` in the head.
    - Balance tools: `data-mode="balance"` on the stage and `data-side="push"|"pull"` on sliders (see `push-pull`).
+   - Optional: `data-score-label` on the stage shows the average rating left of the mirror; sliders can use any `min`/`max` (see `active-listening`).
    - Optional: `data-mid` on a slider shows a center word under its midpoint; a `.poles` header adds overall pole labels (see `resistant-responsive`).
 2. Add the tool to the `TOOLS` list in `public/shared/tools.js`. The landing page and the left navigation both build from it (`letter` puts a letter in its mirror thumbnail).
 3. Commit and push to `main`. Railway deploys automatically.

@@ -27,6 +27,14 @@
       letter: 'P',
       letterColor: '#7d4fb0',   // balance purple, between Tell red and Ask blue
     },
+    {
+      slug: 'active-listening',
+      name: 'Active Listening Audit',
+      question: 'How well do I listen?',
+      description: 'How well do I listen? Rate five listening habits from 1 to 10 and get your Active Listening Score.',
+      letter: 'L',
+      letterColor: '#5b6ee8',   // the audit's blue
+    },
   ];
 
   // A soft, out-of-focus head-and-shoulders shape behind the glass

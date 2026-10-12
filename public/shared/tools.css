@@ -63,18 +63,7 @@
 /* Compact cards in the navigation column */
 .tool-card.compact { gap: 12px; padding: 10px 12px; border-radius: 12px; }
 .tool-card.compact .tool-icon { width: 26px; height: 37px; border-radius: 6px; box-shadow: 0 0 7px 1px rgba(58,139,58,.3); }
-.tool-card.compact .tool-icon:has(.tool-figure) { overflow: hidden; }
-.tool-figure {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  fill: #7d8e9c;
-  opacity: .75;
-  filter: blur(1.6px);
-}
-.tool-card.compact .tool-figure { filter: blur(1.2px); }
-.tool-letter { font-size: 23px; }
+.tool-card.compact .tool-letter { font-size: 23px; }
 .tool-card.compact .tool-name { font-size: 14px; }
 .tool-card.compact .tool-desc {
   font-size: 12px;
